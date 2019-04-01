@@ -1,0 +1,15 @@
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.csprojAssemblyReference.cache
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\bin\Debug\KOASampleCS.exe.config
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\bin\Debug\KOASampleCS.exe
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\bin\Debug\KOASampleCS.pdb
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\bin\Debug\Interop.KHOpenAPILib.dll
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\bin\Debug\AxInterop.KHOpenAPILib.dll
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\Interop.KHOpenAPILib.dll
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\AxInterop.KHOpenAPILib.dll
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.csproj.ResolveComReference.cache
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.Form1.resources
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.Properties.Resources.resources
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.csproj.GenerateResource.cache
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.csproj.CoreCompileInputs.cache
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.exe
+\\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KOASampleCS\KOASampleCS\obj\Debug\KOASampleCS.pdb

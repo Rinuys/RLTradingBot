@@ -1,0 +1,22 @@
+﻿  stdafx.cpp
+  CurrentPriceDlg.cpp
+  GridCell.cpp
+  GridCellBase.cpp
+  GridCtrl.cpp
+\\vmware-host\shared folders\jeonghan\documents\rltradingbot\sample\khopenapitest_2.7\gridctrl\gridctrl.cpp(161): warning C4996: 'GetVersionExA': deprecated로 선언되었습니다.
+  c:\program files (x86)\windows kits\10\include\10.0.17763.0\um\sysinfoapi.h(378): note: 'GetVersionExA' 선언을 참조하십시오.
+  GridDropTarget.cpp
+  InPlaceEdit.cpp
+  TitleTip.cpp
+  KHOpenAPI.cpp
+  KHOpenAPICtrl.cpp
+  KhOpenApiTest.cpp
+  KhOpenApiTestDlg.cpp
+  KwanSimDlg.cpp
+  OrderDlg.cpp
+\\vmware-host\shared folders\jeonghan\documents\rltradingbot\sample\khopenapitest_2.7\orderdlg.cpp(274): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
+\\vmware-host\shared folders\jeonghan\documents\rltradingbot\sample\khopenapitest_2.7\orderdlg.cpp(450): warning C4101: 'lFid' :참조되지 않은 지역 변수입니다.
+  RateDlg.cpp
+  RealAddDlg.cpp
+  코드를 생성하고 있습니다...
+  KhOpenApiTest.vcxproj -> \\vmware-host\Shared Folders\jeonghan\Documents\RLTradingBot\sample\KhOpenApiTest_2.7\Debug\KhOpenApiTest.exe
