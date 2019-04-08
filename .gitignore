@@ -2,4 +2,5 @@
 /venv/
 /.vscode/
 .vs/
-stock.db/
+stock.db
+.idea/
