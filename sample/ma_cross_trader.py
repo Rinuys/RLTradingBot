@@ -9,9 +9,9 @@ def get_dat(col='open'):
     lg = pd.read_csv('../daily_data/cut_066570.csv', usecols=[col])
 
     stock_data = np.array([
-        samsung[col].values[::-1].astype(float),
-        naver[col].values[::-1].astype(float),
-        lg[col].values[::-1].astype(float)
+        samsung[col].values[::1].astype(float),
+        naver[col].values[::1].astype(float),
+        lg[col].values[::1].astype(float)
     ])
     return stock_data
 
@@ -32,7 +32,7 @@ def main(start=20000000, short_period=10, long_period=30):
     ma_short = [ talib.MA(lis, timeperiod=short_period) for lis in stock_data]
     ma_long = [ talib.MA(lis, timeperiod=long_period) for lis in stock_data]
     decision = np.array([
-        get_cross(m10, m30) for m10, m30 in zip(ma_short, ma_long)
+        -get_cross(m10, m30) for m10, m30 in zip(ma_short, ma_long)
     ]) # -1 : sell, 1 : buy
     print("done calculatting to mmoving averge cross.")
 
