@@ -7,6 +7,7 @@ from PyQt5.QtCore import pyqtSlot
 from run import DqnProgram
 
 import threading
+import matplotlib.pyplot as plt
 
 
 class Form(QtWidgets.QDialog):
@@ -68,12 +69,12 @@ class Form(QtWidgets.QDialog):
     @pyqtSlot()
     def modelTest(self):
         self.results = []
-        self.running = threading.Thread(target=DqnProgram, args=(['-m','test','-i','10000000','-w','weights/201905021723-dqn.h5'],self.setInfo))
+        self.running = threading.Thread(target=DqnProgram, args=(['-m','test','-i','10000000','-w','weights/201904281053-dqn.h5'],self.setInfo))
         self.running.daemon = True
         self.running.start()
-
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     w = Form()
     sys.exit(app.exec())
+    
