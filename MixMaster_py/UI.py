@@ -17,7 +17,9 @@ class Form(QtWidgets.QDialog):
 
         self.weight_file = None
         self.info = ['없음','비실행중']
+        self.training_result = []
         self.setInfo("없음")
+        self.running = None
         self.ui.show()
 
     def setInfo(self, file=None, msg=None):
@@ -60,18 +62,28 @@ class Form(QtWidgets.QDialog):
 
     @pyqtSlot()
     def modelTraining(self):
-        self.results = []
-        self.running = threading.Thread(target=DqnProgram, args=(['-m','train','-i','10000000'],self.setInfo))
+        if not self.running is None:
+            return
+        self.results, self.training_result = [], []
+        self.running = threading.Thread(target=DqnProgram, args=(['-m','train','-i','10000000'],self.setInfo, self.training_result))
         self.running.daemon = True
         self.running.start()
 
 
     @pyqtSlot()
     def modelTest(self):
-        self.results = []
-        self.running = threading.Thread(target=DqnProgram, args=(['-m','test','-i','10000000','-w','weights/201904281053-dqn.h5'],self.setInfo))
+        if not self.running is None:
+            return
+        self.results, self.training_result = [], []
+        self.running = threading.Thread(target=DqnProgram, args=(['-m','test','-i','10000000','-w','weights/201904281053-dqn.h5'],self.setInfo, self.training_result))
         self.running.daemon = True
         self.running.start()
+
+    @pyqtSlot()
+    def showGraph(self):
+        plt.plot(self.training_result)
+        plt.ylabel("hoho")
+        plt.show()
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

@@ -201,6 +201,19 @@
     <string>가상 트레이딩</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="showGraphBtn">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>260</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>학습/결과 그래프 확인</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>
@@ -332,6 +345,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>showGraphBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>showGraph()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>342</x>
+     <y>310</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>dqnSelect()</slot>
@@ -343,5 +372,6 @@
   <slot>saveModel()</slot>
   <slot>modelTraining()</slot>
   <slot>modelTest()</slot>
+  <slot>showGraph()</slot>
  </slots>
 </ui>

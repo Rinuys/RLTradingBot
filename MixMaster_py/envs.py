@@ -4,6 +4,7 @@ from gym.utils import seeding
 import numpy as np
 import itertools
 
+from strategy import *
 
 class TradingEnv(gym.Env):
   """
@@ -19,11 +20,20 @@ class TradingEnv(gym.Env):
     - when selling, sell all the shares
     - when buying, buy as many as cash in hand allows
     - if buying multiple stock, equally distribute cash in hand and then utilize the balance
+
+
+  Modified Action: use-w5 (5), use-w4 (4), use-w3 (3), use-w2 (2), use-w1 (1), hold(0),
+    - Depends on each strategy.
+    - when selling, sell all the shares
+    - when buying, buy as many as cash in hand allows
+    - if buying multiple stock, equally distribute cash in hand and then utilize the balance
+
   """
-  def __init__(self, train_data, init_invest=20000):
+  def __init__(self, train_data, init_invest=20000, fee=0.0005):
     # data
     self.stock_price_history = np.around(train_data) # round up to integer to reduce state space
     self.n_stock, self.n_step = self.stock_price_history.shape
+    self.n_strategy = len(strategies)
 
     # instance attributes
     self.init_invest = init_invest
@@ -31,9 +41,10 @@ class TradingEnv(gym.Env):
     self.stock_owned = None
     self.stock_price = None
     self.cash_in_hand = None
+    self.fee = fee
 
     # action space
-    self.action_space = spaces.Discrete(3**self.n_stock)
+    self.action_space = spaces.Box(0,10,(self.n_stock, self.n_strategy))
 
     # observation space: give estimates in order to sample and build scaler
     stock_max_price = self.stock_price_history.max(axis=1)
@@ -86,30 +97,37 @@ class TradingEnv(gym.Env):
 
 
   def _trade(self, action):
-    # all combo to sell(0), hold(1), or buy(2) stocks
-    action_combo = list(map(list, itertools.product([0, 1, 2], repeat=self.n_stock)))
-    action_vec = action_combo[action]
+    # one pass to get buy_value per stock
+    # applying strategy
+    buy_value = []
+    for strategy, weights in zip(strategies, action):
+      strategy_invest = [ w * strategy(self.stock_price_history[i,:self.cur_step]) for i,w in enumerate(weights) ]
+      buy_value.append(strategy_invest)
 
-    # one pass to get sell/buy index
-    sell_index = []
-    buy_index = []
-    for i, a in enumerate(action_vec):
-      if a == 0:
-        sell_index.append(i)
-      elif a == 2:
-        buy_index.append(i)
-
+    buy_value = [ sum(v) for v in zip(*buy_value)]
     # two passes: sell first, then buy; might be naive in real-world settings
-    if sell_index:
-      for i in sell_index:
-        self.cash_in_hand += self.stock_price[i] * self.stock_owned[i]
-        self.stock_owned[i] = 0
-    if buy_index:
-      can_buy = True
-      while can_buy:
-        for i in buy_index:
-          if self.cash_in_hand > self.stock_price[i]:
-            self.stock_owned[i] += 1 # buy one share
-            self.cash_in_hand -= self.stock_price[i]
-          else:
-            can_buy = False
+    for i,v in enumerate(buy_value):
+      if v<0:
+        sell_cnt = min(self.stock_owned[i], v)
+        self.cash_in_hand += int(self.stock_price[i] * sell_cnt * (1.0 - self.fee))
+        self.stock_owned[i] -= sell_cnt
+
+    buy_index_value = [ (i,v) for i,v in enumerate(buy_value) if v>0 ]
+    for i,v in buy_index_value:
+      if self.cash_in_hand > self.stock_price[i] * v:
+        self.stock_owned[i] += v
+        self.cash_in_hand -= int(self.stock_price[i] * v * (1.0 + self.fee))
+
+
+
+
+      # for i,v in buy_index_value:
+      #     if buy_cnt[i]<v or self.cash_in_hand > self.stock_price[i]:
+      #       self.stock_owned[i] += 1
+      #       buy_cnt[i]+=1
+      #       self.cash_in_hand -= self.stock_price[i]
+      #     elif self.cash_in_hand >= self.stock_price[i]:
+      #       left_money=False
+      # if all([ a==b for a,b in zip(buy_cnt, buy_max_cnt) ]):
+      #     buy_cnt = [ 0 for _ in range(self.n_stock)]
+

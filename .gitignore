@@ -1,6 +1,7 @@
 .DS_Store
-/venv/
+venv/
 /.vscode/
 .vs/
 stock.db
 .idea/
+__pycache__/
