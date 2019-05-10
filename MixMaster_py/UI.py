@@ -28,6 +28,8 @@ class Form(QtWidgets.QDialog):
         self.info[1] = msg if not msg is None else self.info[1]
         self.ui.modelInfoLabel.setText(baseText.format(*self.info))
 
+
+    #이벤트 슬롯 구현
     @pyqtSlot()
     def ppoSelect(self):
         print("sel ppo")
@@ -50,11 +52,16 @@ class Form(QtWidgets.QDialog):
 
     @pyqtSlot()
     def createModel(self):
-        pass
+        self.weight_file = None
+        self.setInfo(file="None")
 
     @pyqtSlot()
     def loadModel(self):
-        pass
+        self.weight_file = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file',
+                                    '', "weights files (*.h5)")[0]
+        file_name = self.weight_file.split('/')[-1]
+        self.setInfo(file=file_name)
+
 
     @pyqtSlot()
     def saveModel(self):
@@ -75,7 +82,7 @@ class Form(QtWidgets.QDialog):
         if not self.running is None:
             return
         self.results, self.training_result = [], []
-        self.running = threading.Thread(target=DqnProgram, args=(['-m','test','-i','10000000','-w','weights/201904281053-dqn.h5'],self.setInfo, self.training_result))
+        self.running = threading.Thread(target=DqnProgram, args=(['-m','test','-i','10000000','-w',self.weight_file],self.setInfo, self.training_result))
         self.running.daemon = True
         self.running.start()
 

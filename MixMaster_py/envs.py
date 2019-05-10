@@ -21,7 +21,6 @@ class TradingEnv(gym.Env):
     - when buying, buy as many as cash in hand allows
     - if buying multiple stock, equally distribute cash in hand and then utilize the balance
 
-
   Modified Action: use-w5 (5), use-w4 (4), use-w3 (3), use-w2 (2), use-w1 (1), hold(0),
     - Depends on each strategy.
     - when selling, sell all the shares
@@ -118,16 +117,4 @@ class TradingEnv(gym.Env):
         self.stock_owned[i] += v
         self.cash_in_hand -= int(self.stock_price[i] * v * (1.0 + self.fee))
 
-
-
-
-      # for i,v in buy_index_value:
-      #     if buy_cnt[i]<v or self.cash_in_hand > self.stock_price[i]:
-      #       self.stock_owned[i] += 1
-      #       buy_cnt[i]+=1
-      #       self.cash_in_hand -= self.stock_price[i]
-      #     elif self.cash_in_hand >= self.stock_price[i]:
-      #       left_money=False
-      # if all([ a==b for a,b in zip(buy_cnt, buy_max_cnt) ]):
-      #     buy_cnt = [ 0 for _ in range(self.n_stock)]
 

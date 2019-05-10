@@ -2,7 +2,6 @@ from collections import deque
 import random
 import numpy as np
 from model import mlp
-import itertools
 
 
 class DQNAgent(object):
@@ -26,8 +25,8 @@ class DQNAgent(object):
 
 
   def act(self, state):
-    # if np.random.rand() <= self.epsilon:
-    #   return np.random.randint(-10,10,self.action_size)
+    if np.random.rand() <= self.epsilon:
+      return np.random.randint(self.invest_range[0],self.invest_range[1]+1,self.action_size)
     act_values = self.model.predict(state)
     act_values = act_values[0]
 
@@ -47,12 +46,6 @@ class DQNAgent(object):
   def replay(self, batch_size=32):
     """ vectorized implementation; 30x speed up compared with for loop """
     minibatch = random.sample(self.memory, batch_size)
-
-    # states = np.array([tup[0][0] for tup in minibatch])
-    # actions = np.array([tup[1] for tup in minibatch])
-    # rewards = np.array([tup[2] for tup in minibatch])
-    # next_states = np.array([tup[3][0] for tup in minibatch])
-    # done = np.array([tup[4] for tup in minibatch])
 
     states_all, actions, rewards, next_states_all, done = map(np.array, list(zip(*minibatch)))
     states = np.array(states_all[:,0])
@@ -78,7 +71,6 @@ class DQNAgent(object):
 
   def load(self, name):
     self.model.load_weights(name)
-
 
   def save(self, name):
     self.model.save_weights(name)
