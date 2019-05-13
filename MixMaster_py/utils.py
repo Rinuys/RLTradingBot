@@ -4,18 +4,29 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 
-def get_data(col=['종가']):
-  """ Returns a 1 x n_step array """
+data_set_col = ['년/월/일','시가','종가','고가','저가']
+data_set_index = '년/월/일'
+data_set = {
+  '금': pd.read_csv('../gold_daily_data/gold_krx_1000.csv', usecols=data_set_col, index_col=data_set_index),
+  '석유': pd.read_csv('../gold_daily_data/fake_gold.csv', usecols=data_set_col, index_col=data_set_index),
+}
 
-  gold = pd.read_csv('../gold_daily_data/gold_krx_1000.csv', usecols=col)
-  # recent price are at top; reverse it
+# pd.DataFrame의 형태로된 종목 데이터들의 리스트가 반환됩니다.
+def get_data(col=['종가'], select=None, mode='train', test_train_cut=0.75):
+  data_cut_point = int(test_train_cut * len(data_set['금']))
+  select = data_set.keys() if select is None else [select] # 하나의 종목코드 선택
+  data_list = []
 
-  for c in col:
-    gold[c] = gold[c].map(lambda x : int(x.replace(',','')))
-
-
-
-  return np.array([ gold['종가'].values[::-1], ])
+  for subject in select:
+    dat = data_set[subject][col]
+    dat_filter = pd.DataFrame()
+    for c in col:
+      # 최근 가격이 위쪽임 => 순서 역전시키기
+      hoho = dat[c].map(lambda x : int(x.replace(',',''))).values[::-1]
+      # 학습, 테스트 데이터 구분
+      dat_filter[c] = hoho[:data_cut_point] if mode=='train' else hoho[data_cut_point:]
+    data_list.append(dat_filter)
+  return data_list
 
 def get_scaler(env):
   """ Takes a env and returns a scaler for its observation space """
@@ -40,3 +51,4 @@ def get_scaler(env):
 def maybe_make_dir(directory):
   if not os.path.exists(directory):
     os.makedirs(directory)
+    

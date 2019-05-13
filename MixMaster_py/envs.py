@@ -43,7 +43,7 @@ class TradingEnv(gym.Env):
     self.fee = fee
 
     # action space
-    self.action_space = spaces.Box(0,10,(self.n_stock, self.n_strategy))
+    self.action_space = spaces.Box(0,10,(self.n_strategy, self.n_stock))
 
     # observation space: give estimates in order to sample and build scaler
     stock_max_price = self.stock_price_history.max(axis=1)

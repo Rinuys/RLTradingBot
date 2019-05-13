@@ -13,7 +13,6 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 def DqnProgram(args, setResult, training_result):
-
   parser = argparse.ArgumentParser()
   parser.add_argument('-e', '--episode', type=int, default=2000,
                       help='number of episode to run')
@@ -31,13 +30,10 @@ def DqnProgram(args, setResult, training_result):
 
   import time
   timestamp = time.strftime('%Y%m%d%H%M')
-  data = get_data()
-  data_size = data.shape[1]
-  data_cut_point = int(0.75*data_size)
-  train_data = data[:, :data_cut_point]
-  test_data = data[:, data_cut_point:]
+  data = get_data(mode=args.mode) # TODO UI의 종목과 연결시키기.
+  data = np.array([ c['종가'] for c in data ])
 
-  env = TradingEnv(train_data, args.initial_invest)
+  env = TradingEnv(data, args.initial_invest)
   state_size = env.observation_space.shape
   action_size = env.action_space.shape
   agent = DQNAgent(state_size, action_size)
@@ -45,14 +41,8 @@ def DqnProgram(args, setResult, training_result):
 
   portfolio_value = []
 
-
-
-  if args.mode == 'test':
-    # remake the env with test data
-    env = TradingEnv(test_data, args.initial_invest)
-    # load trained weights
+  if not args.weights is None:
     agent.load(args.weights)
-    # when test, the timestamp is same as time when weights was trained
     timestamp = re.findall(r'\d{12}', args.weights)[0]
 
   for e in range(args.episode):
