@@ -8,6 +8,7 @@ import numpy as np
 from tensorforce import TensorForceError
 from tensorforce.environments import Environment
 from env.TFTraderEnv import OhlcvEnv
+import env.Strategies as Strategies
 
 class OpenAIGym(Environment):
     """
@@ -39,7 +40,7 @@ class OpenAIGym(Environment):
             self.gym = gym.wrappers.Monitor(self.gym, monitor, force=not monitor_safe, video_callable=video_callable)
 
         self._states = dict(type='float', shape=gym.shape)
-        self._actions = self.actions_ = dict(type='int', shape=(), num_actions=3)
+        self._actions = self.actions_ = dict(type='float', shape=(Strategies.strategies))
 
     def __str__(self):
         return 'OpenAIGym({})'.format(self.gym.name)
@@ -229,17 +230,12 @@ import math, random
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from collections import deque
 
-# constant
-HOLD_THRESHOLD = 1
-LONG = 0
-SHORT = 1
-FLAT = 2
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-def create_btc_env(window_size, path, train):
-    raw_env = OhlcvEnv(window_size=window_size, path=path, train=train)
-    env = OpenAIGym(raw_env, visualize=False)
-    return env
+# def create_btc_env(window_size, path, train):
+#     raw_env = OhlcvEnv(window_size=window_size, path=path, train=train)
+#     env = OpenAIGym(raw_env, visualize=False)
+#     return env
 
 def create_gold_env(window_size, path, train):
     raw_env = OhlcvEnv(window_size=window_size, path=path, train=train)

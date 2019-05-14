@@ -5,7 +5,7 @@ import numpy as np
 
 from tensorforce.agents import PPOAgent
 from tensorforce.execution import Runner
-from env.gymWrapper import create_btc_env
+from env.gymWrapper import create_gold_env
 
 import os
 
@@ -122,7 +122,7 @@ def main():
         environment=test_environment,
     )
 
-    train_runner.run(episodes=5, max_episode_timesteps=16000, episode_finished=episode_finished)
+    train_runner.run(episodes=2000, max_episode_timesteps=16000, episode_finished=episode_finished)
     print("Learning finished. Total episodes: {ep}. Average reward of last 100 episodes: {ar}.".format(
         ep=train_runner.episode,
         ar=np.mean(train_runner.episode_rewards[-100:]))
