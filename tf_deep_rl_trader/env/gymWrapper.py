@@ -3,6 +3,7 @@ from __future__ import print_function
 from __future__ import division
 
 import gym
+import gym.wrappers
 import numpy as np
 from tensorforce import TensorForceError
 from tensorforce.environments import Environment
@@ -236,6 +237,11 @@ FLAT = 2
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 def create_btc_env(window_size, path, train):
+    raw_env = OhlcvEnv(window_size=window_size, path=path, train=train)
+    env = OpenAIGym(raw_env, visualize=False)
+    return env
+
+def create_gold_env(window_size, path, train):
     raw_env = OhlcvEnv(window_size=window_size, path=path, train=train)
     env = OpenAIGym(raw_env, visualize=False)
     return env

@@ -26,7 +26,9 @@ class OhlcvEnv(gym.Env):
         self.train= train
         self.show_trade = show_trade
         self.path = path
-        self.actions = ["LONG", "SHORT", "FLAT"]
+        #self.actions = ["LONG", "SHORT", "FLAT"]
+        self.actions = dict(min_value=0.0, max_value=10.0, type="float", shape=(self.n_strategies,))
+        self.n_strategies = 1
         self.fee = 0.0005
         self.seed()
         self.file_list = []
@@ -39,7 +41,8 @@ class OhlcvEnv(gym.Env):
         self.shape = (self.window_size, self.n_features+4)
 
         # defines action space
-        self.action_space = spaces.Discrete(len(self.actions))
+        #self.action_space = spaces.Discrete(len(self.actions))
+        self.action_space = spaces.Box(low=0, high=10, shape=(self.n_strategies,), dtype=np.float32)
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=self.shape, dtype=np.float32)
 
     def load_from_csv(self):
@@ -151,7 +154,7 @@ class OhlcvEnv(gym.Env):
             self.reward = self.get_profit() # return reward at end of the game
             if(self.train == False):
                 np.array([info]).dump(
-                    './info/ppo_{0}_LS_{1}_{2}.info'.format(self.portfolio,
+                    'info/ppo_{0}_LS_{1}_{2}.info'.format(self.portfolio,
                                                                  self.n_long,
                                                                  self.n_short))
         return self.state, self.reward, self.done, info
