@@ -85,7 +85,7 @@ class OhlcvEnv(gym.Env):
             return self.state, self.reward, self.done, {}
         self.reward = 0
 
-        buy_value = [ w*strategy(self.closingPrices[:self.current_tick]) for strategy, w in zip(Strategies.strategies, action)]
+        buy_value = [ w*st['function'](self.closingPrices[:self.current_tick],*st['args'],**st['kwargs']) for st, w in zip(Strategies.strategies, action)]
 
         # two passes: sell first, then buy; might be naive in real-world settings
         v = sum(buy_value)
@@ -114,7 +114,7 @@ class OhlcvEnv(gym.Env):
             
         else:
             # hold
-            self.holdFactor *= 0.5
+            self.holdFactor *= 1.01
             pass
         
         temp_portfolio = self.cash_in_hand + self.stock_owned * self.closingPrice

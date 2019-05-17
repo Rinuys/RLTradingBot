@@ -15,4 +15,11 @@ def MovingAverage(close_history, long=30, short=5):
             return -1
     return 0
 
-strategies = [MovingAverage]
+strategies = [
+    dict(function=MovingAverage,
+         kwargs=dict(long=30,short=5),
+         args=[]),
+    dict(function=MovingAverage,
+         kwargs=dict(long=60,short=10),
+         args=[]),
+]
