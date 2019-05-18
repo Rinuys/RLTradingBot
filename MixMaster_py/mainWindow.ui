@@ -76,11 +76,6 @@
     <property name="selectionMode">
      <enum>QAbstractItemView::MultiSelection</enum>
     </property>
-    <item>
-     <property name="text">
-      <string>MACD</string>
-     </property>
-    </item>
    </widget>
   </widget>
   <widget class="QGroupBox" name="subjectGroupBox">
@@ -107,16 +102,6 @@
     <property name="selectionMode">
      <enum>QAbstractItemView::MultiSelection</enum>
     </property>
-    <item>
-     <property name="text">
-      <string>Gold</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Silver</string>
-     </property>
-    </item>
    </widget>
   </widget>
   <widget class="QPushButton" name="newModelBtn">
