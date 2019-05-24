@@ -19,19 +19,18 @@ gl_ui_window = None
 # Callback function printing episode statistics
 def episode_finished(r):
     # TODO 모델을 여기서 매호ㅓ 저장??
-
     reward = "%.6f" % (r.episode_rewards[-1])
     msg = "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
                                                                                  reward=reward)
     print(msg)
     gl_ui_window.setInfo(msg=msg)
+    gl_ui_window.portpolio_value_history.append(reward) # TODO 포트 폴리오 값 얻는법을 찾아야함.
 
     if np.mean(r.episode_rewards[-1]) > 0 :
         r.agent.save_model(SAVE_DIR, append_timestep=False)
     return True
 
 def print_simple_log(r):
-
     msg = "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
                                                                                  reward=r.episode_rewards[-1])
     print(msg)
@@ -64,7 +63,7 @@ def main(
         mode, # 'train'  or 'test'
         episode=2000,
         window_size=32, # agent 브레인이 참고할 이전 타임스텝의 길이
-        initial_invest=20000,
+        init_invest=20000,
         model_path=None,
         selected_learn='dqn', # 'dqn' or 'ppo'
         selected_trading=[],
@@ -73,16 +72,18 @@ def main(
 ):
     global gl_ui_window
     gl_ui_window=ui_windows
+
     # create environment for train and test
-    PATH = '../gold_daily_data' 
-    environment = create_gold_env(window_size=window_size, path=PATH, train=True if mode=='train' else False,
-                                  selected_trading=selected_trading, selected_subject=selected_subject)
+    environment = create_gold_env(window_size=window_size, path=model_path, train=True if mode=='train' else False,
+                                  selected_trading=selected_trading, selected_subject=selected_subject,
+                                  init_invest=init_invest)
 
 
     network_spec = create_network_spec()
     baseline_spec = create_baseline_spec()
 
     # TODO Agent Strategies 의존성을 UI에서 선택가능하게끔 변경해야함.
+    print(selected_learn)
 
 
     if selected_learn=='ppo':
@@ -149,13 +150,13 @@ def main(
     runner = Runner(agent=agent, environment=environment)
     if mode=='train':
         kwargs=dict(
-            episode=episode, max_episode_timesteps=16000, episode_finished=episode_finished
+            episodes=episode, max_episode_timesteps=16000, episode_finished=episode_finished
         )
     else: # mode=='test'
         kwargs=dict(
             num_episodes=episode, deterministic=True, testing=True, episode_finished=print_simple_log
         )
-    runner.run(kwargs)
+    runner.run(**kwargs)
 
     # TODO save models. UI쪽에서 사용할 메타데이터저장하기. https://tensorforce.readthedocs.io/en/latest/agents_models.html?highlight=agent
     # agent.save_model()

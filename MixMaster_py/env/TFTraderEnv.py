@@ -15,7 +15,8 @@ import os
 class OhlcvEnv(gym.Env):
 
     def __init__(self, window_size, path, selected_trading, selected_subject, train=True, show_trade=True,
-                 ):
+                 init_invest=100*10000):
+        self.init_invest=init_invest
         self.maxTrade = 100.0
         self.train= train
         self.show_trade = show_trade
@@ -121,7 +122,7 @@ class OhlcvEnv(gym.Env):
         
         temp_portfolio = self.cash_in_hand + self.stock_owned * self.closingPrice
         self.portfolio = temp_portfolio
-        self.reward += (temp_portfolio - self.init_cash) * self.holdFactor
+        self.reward += (temp_portfolio - self.init_invest) * self.holdFactor
         self.current_tick += 1
 
         if(self.show_trade and self.current_tick%100 == 0):
@@ -152,12 +153,11 @@ class OhlcvEnv(gym.Env):
 
         # clear internal variables
         self.history = [] # keep buy, sell, hold action history
-        self.init_cash = 100 * 10000
-        self.cash_in_hand = self.init_cash # initial balance, u can change it to whatever u like
+        self.cash_in_hand = self.init_invest # initial balance, u can change it to whatever u like
         self.portfolio = float(self.cash_in_hand) # (coin * current_price + current_krw_balance) == portfolio
         self.closingPrice = self.closingPrices[self.current_tick]
 
-        self.action = np.zeros(len(self.n_strategies))
+        self.action = np.zeros(self.n_strategies)
         self.done = False
 
         self.state_queue = deque(maxlen=self.window_size)
@@ -169,7 +169,7 @@ class OhlcvEnv(gym.Env):
         while(len(self.state_queue) < self.window_size):
             # rand_action = random.randint(0, len(self.actions)-1)
             # rand_action = 2
-            rand_action = np.random.rand(len(self.n_strategies))*self.maxTrade
+            rand_action = np.random.rand(self.n_strategies)*self.maxTrade
             s, r, d, i= self._step(rand_action)
             self.state_queue.append(s)
         return self.normalize_frame(np.concatenate(tuple(self.state_queue)))

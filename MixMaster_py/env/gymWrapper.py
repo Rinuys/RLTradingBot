@@ -237,7 +237,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 #     env = OpenAIGym(raw_env, visualize=False)
 #     return env
 
-def create_gold_env(window_size, path, train, selected_trading, selected_subject, ohlcv_kwargs={}):
+def create_gold_env(window_size, path, train, selected_trading, selected_subject, **ohlcv_kwargs):
     '''
     :param window_size: 초기 랜덤액션선택할 에피소드수
     :param path: 파일 경로
