@@ -19,7 +19,7 @@ class Form(QtWidgets.QDialog):
 
         self.weight_path = None # 현재 선택된 모델이 담긴 폴더 TODO 모델 파일? 폴더?
         self.info = ['없음','비실행중']  # ['현재 모델파일', '학습/테스트 메시지']
-        self.training_result = [] # 학습/테스트 스레드가 남길 히스토리배열
+        self.portpolio_value_history = [] # 학습/테스트 스레드가 남길 히스토리배열
         self.setInfo("없음")
         self.running = None
         self.ui.show()
@@ -96,9 +96,10 @@ class Form(QtWidgets.QDialog):
     def modelTraining(self):
         if not self.running is None and self.running.is_alive():
             return
-        self.results, self.training_result = [], []
+        self.portpolio_value_history = []
         kwargs=dict(
             mode='train',
+            episode=2000,
             batch_size=32,
             initial_invest=20000,
             model_path=self.weight_path,
@@ -117,18 +118,30 @@ class Form(QtWidgets.QDialog):
     def modelTest(self):
         if not self.running is None and self.running.is_alive():
             return
-        self.results, self.training_result = [], []
+        self.portpolio_value_history = []
         if self.weight_path is None:
             self.setInfo(msg="트레이딩을 하기 위해 학습된 모델을 로드해주세요.")
             return
-        args_w = ['-w',self.weight_path]
-        self.running = threading.Thread(target=program, args=(['-m','test','-i','10000000']+args_w, self.setInfo, self.training_result))
+
+        kwargs=dict(
+            mode='test',
+            episode=1,
+            batch_size=32,
+            initial_invest=20000,
+            model_path=self.weight_path,
+            selected_learn=self.selected_learn,
+            selected_trading=self.selected_trading,
+            selected_subject=self.selected_subject,
+            ui_windows=self,
+        )
+        # run_program
+        self.running = threading.Thread(target=program, kwargs=kwargs)
         self.running.daemon = True
         self.running.start()
 
     @pyqtSlot()
     def showGraph(self):
-        plt.plot(self.training_result)
+        plt.plot(self.portpolio_value_history)
         plt.ylabel("포트폴리오 가치")
         plt.show()
 

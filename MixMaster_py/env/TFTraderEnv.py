@@ -14,7 +14,8 @@ import os
 
 class OhlcvEnv(gym.Env):
 
-    def __init__(self, window_size, path, selected_trading, selected_subject, train=True, show_trade=True, ):
+    def __init__(self, window_size, path, selected_trading, selected_subject, train=True, show_trade=True,
+                 ):
         self.maxTrade = 100.0
         self.train= train
         self.show_trade = show_trade
@@ -30,7 +31,7 @@ class OhlcvEnv(gym.Env):
         self.load_from_csv()
 
         # n_features
-        self.window_size = window_size
+        self.window_size = window_size # agent 브레인이 참고할 이전 타임스텝의 길이
         self.n_features = self.df.shape[1]
         self.shape = (self.window_size, self.n_features)
 
@@ -44,7 +45,7 @@ class OhlcvEnv(gym.Env):
             self.file_list = [x.name for x in Path(self.path).iterdir() if x.is_file()]
             self.file_list.sort()
         self.rand_episode = self.file_list.pop()
-        raw_df= pd.read_csv(self.path + self.rand_episode)
+        raw_df= pd.read_csv(self.path + "/"+ self.rand_episode)
         extractor = process_data.FeatureExtractor(raw_df)
         self.df = extractor.add_bar_features() # bar features o, h, l, c ---> C(4,2) = 4*3/2*1 = 6 features
 
@@ -156,7 +157,7 @@ class OhlcvEnv(gym.Env):
         self.portfolio = float(self.cash_in_hand) # (coin * current_price + current_krw_balance) == portfolio
         self.closingPrice = self.closingPrices[self.current_tick]
 
-        self.action = np.zeros(len(Strategies.strategies))
+        self.action = np.zeros(len(self.n_strategies))
         self.done = False
 
         self.state_queue = deque(maxlen=self.window_size)
@@ -168,7 +169,7 @@ class OhlcvEnv(gym.Env):
         while(len(self.state_queue) < self.window_size):
             # rand_action = random.randint(0, len(self.actions)-1)
             # rand_action = 2
-            rand_action = np.random.rand(len(Strategies.strategies))*self.maxTrade
+            rand_action = np.random.rand(len(self.n_strategies))*self.maxTrade
             s, r, d, i= self._step(rand_action)
             self.state_queue.append(s)
         return self.normalize_frame(np.concatenate(tuple(self.state_queue)))
