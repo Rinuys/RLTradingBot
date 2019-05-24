@@ -3,7 +3,7 @@ from __future__ import print_function
 from __future__ import division
 import numpy as np
 
-from tensorforce.agents import PPOAgent
+from tensorforce.agents import PPOAgent, DQNAgent
 from tensorforce.execution import Runner
 from env.gymWrapper import create_gold_env
 
@@ -52,95 +52,96 @@ def create_baseline_spec():
     return baseline_spec
 
 
-def main(*args):
-    # parsing arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--episode', type=int, default=2000,
-                      help='number of episode to run')
-    parser.add_argument('-b', '--batch_size', type=int, default=32,
-                      help='batch size for experience replay')
-    parser.add_argument('-i', '--initial_invest', type=int, default=20000,
-                      help='initial investment amount')
-    parser.add_argument('-m', '--mode', type=str, required=True,
-                      help='either "train" or "test"')
-    parser.add_argument('-w', '--weights', type=str, help='a trained model weights')
-    args = parser.parse_args(args)
-
-
+def main(
+        mode, # 'train'  or 'test'
+        episode=2000,
+        batch_size=32,
+        initial_invest=20000,
+        model_path=None,
+        selected_learn='dqn', # 'dqn' or 'ppo'
+        selected_trading=[],
+        selected_subject=[],
+        ui_windows=None, # 현재 띄워진 Ui객체
+):
 
     # create environment for train and test
     PATH_TRAIN = "data/train/"
     PATH_TEST = "data/test/"
     TIMESTEP = 30 # window size
-    environment = create_gold_env(window_size=TIMESTEP, path=PATH_TRAIN, train=True)
-    test_environment = create_gold_env(window_size=TIMESTEP, path=PATH_TEST, train=False)
+    environment = create_gold_env(window_size=TIMESTEP, path=PATH_TRAIN, train=True,
+                                  selected_trading=selected_trading, selected_subject=selected_subject)
+    test_environment = create_gold_env(window_size=TIMESTEP, path=PATH_TEST, train=False,
+                                       selected_trading=selected_trading, selected_subject=selected_subject)
 
     network_spec = create_network_spec()
     baseline_spec = create_baseline_spec()
 
-    # TODO DQNAgent도 선택적 만들기.
     # TODO Agent Strategies 의존성을 UI에서 선택가능하게끔 변경해야함.
 
 
-    agent = PPOAgent(
-        discount=0.9999,
-        states=environment.states,
-        actions=environment.actions,
-        network=network_spec,
-        # Agent
-        states_preprocessing=None,
-        actions_exploration=None,
-        reward_preprocessing=None,
-        # MemoryModel
-        update_mode=dict(
-            unit= 'timesteps', #'episodes',
-            # 10 episodes per update
-            batch_size= 32,
-            # # Every 10 episodes
-            frequency=10
-        ),
-        memory=dict(
-            type='latest',
-            include_next_states=False,
-            capacity=50000
-        ),
-        # DistributionModel
-        distributions=None,
-        entropy_regularization=0.0,  # None
-        # PGModel
-
-        baseline_mode='states',
-        baseline=dict(type='custom', network=baseline_spec),
-        baseline_optimizer=dict(
-            type='multi_step',
-            optimizer=dict(
-                type='adam',
-                learning_rate=(1e-4)  # 3e-4
+    if selected_learn=='ppo':
+        agent = PPOAgent(
+            discount=0.9999,
+            states=environment.states,
+            actions=environment.actions,
+            network=network_spec,
+            # Agent
+            states_preprocessing=None,
+            actions_exploration=None,
+            reward_preprocessing=None,
+            # MemoryModel
+            update_mode=dict(
+                unit= 'timesteps', #'episodes',
+                # 10 episodes per update
+                batch_size= 32,
+                # # Every 10 episodes
+                frequency=10
             ),
-            num_steps=5
-        ),
-        gae_lambda=0,  # 0
-        # PGLRModel
-        likelihood_ratio_clipping=0.2,
-        # PPOAgent
-        step_optimizer=dict(
-            type='adam',
-            learning_rate=(1e-4)  # 1e-4
-        ),
-        subsampling_fraction=0.2,  # 0.1
-        optimization_steps=10,
-        execution=dict(
-            type='single',
-            session_config=None,
-            distributed_spec=None
+            memory=dict(
+                type='latest',
+                include_next_states=False,
+                capacity=50000
+            ),
+            # DistributionModel
+            distributions=None,
+            entropy_regularization=0.0,  # None
+            # PGModel
+
+            baseline_mode='states',
+            baseline=dict(type='custom', network=baseline_spec),
+            baseline_optimizer=dict(
+                type='multi_step',
+                optimizer=dict(
+                    type='adam',
+                    learning_rate=(1e-4)  # 3e-4
+                ),
+                num_steps=5
+            ),
+            gae_lambda=0,  # 0
+            # PGLRModel
+            likelihood_ratio_clipping=0.2,
+            # PPOAgent
+            step_optimizer=dict(
+                type='adam',
+                learning_rate=(1e-4)  # 1e-4
+            ),
+            subsampling_fraction=0.2,  # 0.1
+            optimization_steps=10,
+            execution=dict(
+                type='single',
+                session_config=None,
+                distributed_spec=None
+            )
         )
-    )
+    else: # learn_model=='dqn' or etc.
+        agent = DQNAgent(
+            states=environment.states,
+            actions=environment.actions,
+            network=network_spec,
+        )
 
     train_runner = Runner(agent=agent, environment=environment)
-    test_runner = Runner(
-        agent=agent,
-        environment=test_environment,
-    )
+    test_runner = Runner(agent=agent,environment=test_environment)
 
     train_runner.run(episodes=5, max_episode_timesteps=16000, episode_finished=episode_finished)
 

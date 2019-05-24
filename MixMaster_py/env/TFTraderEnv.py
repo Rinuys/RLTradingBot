@@ -10,19 +10,20 @@ from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from collections import deque
 import env.Strategies as Strategies
+import os
 
 class OhlcvEnv(gym.Env):
 
-    def __init__(self, window_size, path, train=True, show_trade=True):
+    def __init__(self, window_size, path, selected_trading, selected_subject, train=True, show_trade=True, ):
         self.maxTrade = 100.0
         self.train= train
         self.show_trade = show_trade
         self.holdFactor = 1.0
-        self.path = path
+        self.path = os.path.join(path, "train" if train else "test")
         #self.actions = ["LONG", "SHORT", "FLAT"]
-        self.n_strategies = len(Strategies.strategies)
+        self.n_strategies = len(selected_trading)
         self.actions = dict(min_value=0.0, max_value=self.maxTrade, type="float", shape=(self.n_strategies,))
-        self.fee = 0.0005
+        self.fee = 0.01
         self.seed()
         self.file_list = []
         # load_csv
@@ -90,7 +91,7 @@ class OhlcvEnv(gym.Env):
         # two passes: sell first, then buy; might be naive in real-world settings
         v = sum(buy_value)
 
-        if v>3.0:
+        if v>1.0:
             # buy
             self.holdFactor = 1.0
             v = int(v)
@@ -101,7 +102,7 @@ class OhlcvEnv(gym.Env):
             self.cash_in_hand -= int(self.closingPrice * v * (1.0 + self.fee))
             self.stock_owned += v
 
-        elif v<-3.0:
+        elif v<-1.0:
             # sell
             self.holdFactor = 1.0
             v = int(abs(v))
@@ -114,7 +115,7 @@ class OhlcvEnv(gym.Env):
             
         else:
             # hold
-            self.holdFactor *= 1.01
+            self.holdFactor *= 1.01 # 음수에선 강한 부정리워드, 양수에선 강한 긍정리워드
             pass
         
         temp_portfolio = self.cash_in_hand + self.stock_owned * self.closingPrice

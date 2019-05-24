@@ -237,8 +237,16 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 #     env = OpenAIGym(raw_env, visualize=False)
 #     return env
 
-def create_gold_env(window_size, path, train):
-    raw_env = OhlcvEnv(window_size=window_size, path=path, train=train)
+def create_gold_env(window_size, path, train, selected_trading, selected_subject):
+    '''
+    :param window_size: 초기 랜덤액션선택할 에피소드수
+    :param path: 파일 경로
+    :param train: 훈련여부? 아니면 테스트.
+    tuple:param selected: (selected_learn, selected_trading, selected_subject). UI.py참조
+    :return: gym Environment
+    '''
+    raw_env = OhlcvEnv(window_size=window_size, path=path, train=train,
+                       selected_subject=selected_subject,selected_trading=selected_trading)
     env = OpenAIGym(raw_env, visualize=False)
     return env
 

@@ -37,6 +37,9 @@
     <property name="text">
      <string>PPO</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QRadioButton" name="selectDQN">
     <property name="geometry">
@@ -84,11 +87,11 @@
      <x>360</x>
      <y>10</y>
      <width>161</width>
-     <height>301</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="title">
-    <string>트레이딩에 사용할 종목 선택</string>
+    <string>트레이딩할 종목 선택</string>
    </property>
    <widget class="QListWidget" name="subjectList">
     <property name="geometry">
@@ -96,11 +99,11 @@
       <x>10</x>
       <y>30</y>
       <width>141</width>
-      <height>261</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::MultiSelection</enum>
+     <enum>QAbstractItemView::SingleSelection</enum>
     </property>
    </widget>
   </widget>
@@ -198,6 +201,32 @@
    <property name="text">
     <string>학습/결과 그래프 확인</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="viewSubjectGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>130</y>
+     <width>161</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>모델이 사용할 지표 선택</string>
+   </property>
+   <widget class="QListWidget" name="viewSubjectList">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>141</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::MultiSelection</enum>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
@@ -343,6 +372,38 @@
     <hint type="destinationlabel">
      <x>342</x>
      <y>310</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewSubjectList</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>changedSubject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>426</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>450</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>subjectList</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>changedSubject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>413</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>373</x>
+     <y>311</y>
     </hint>
    </hints>
   </connection>

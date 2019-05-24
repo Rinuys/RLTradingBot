@@ -16,10 +16,12 @@ def MovingAverage(close_history, long=30, short=5):
     return 0
 
 strategies = [
-    dict(function=MovingAverage,
+    dict(name='MA_30_5',
+         function=MovingAverage,
          kwargs=dict(long=30,short=5),
          args=[]),
-    dict(function=MovingAverage,
+    dict(name='MA_60_10',
+         function=MovingAverage,
          kwargs=dict(long=60,short=10),
          args=[]),
 ]
