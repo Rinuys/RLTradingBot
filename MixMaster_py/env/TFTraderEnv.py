@@ -24,6 +24,7 @@ class OhlcvEnv(gym.Env):
         self.path = os.path.join(path, "train" if train else "test")
         #self.actions = ["LONG", "SHORT", "FLAT"]
         self.n_strategies = len(selected_trading)
+        self.selected_trading = selected_trading
         self.actions = dict(min_value=0.0, max_value=self.maxTrade, type="float", shape=(self.n_strategies,))
         self.fee = 0.01
         self.seed()
@@ -88,7 +89,7 @@ class OhlcvEnv(gym.Env):
             return self.state, self.reward, self.done, {}
         self.reward = 0
 
-        buy_value = [ w*st['function'](self.closingPrices[:self.current_tick],*st['args'],**st['kwargs']) for st, w in zip(Strategies.strategies, action)]
+        buy_value = [ w*st['function'](self.closingPrices[:self.current_tick],*st['args'],**st['kwargs']) for st, w in zip(self.selected_trading, action)]
 
         # two passes: sell first, then buy; might be naive in real-world settings
         v = sum(buy_value)

@@ -59,7 +59,8 @@ class Form(QtWidgets.QDialog):
     @pyqtSlot()
     def changedTrading(self):
         ''' 기존에 구현된 알고리즘 트레이딩 전략 선택 이벤트핸들러'''
-        self.selected_trading = [elem.text() for elem in self.tradingList.selectedItems()]
+        self.selected_trading = strategies_name_filter([elem.text() for elem in self.tradingList.selectedItems()])
+        print(self.selected_trading)
 
     @pyqtSlot()
     def changedSubject(self):
@@ -102,7 +103,7 @@ class Form(QtWidgets.QDialog):
             episode=2000,
             window_size=32,
             init_invest=100*10000,
-            model_path='../gold_daily_data',
+            model_path='model/',
             selected_learn=self.selected_learn,
             selected_trading=self.selected_trading,
             selected_subject=self.selected_subject,

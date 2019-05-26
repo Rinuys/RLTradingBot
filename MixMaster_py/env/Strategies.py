@@ -25,3 +25,4 @@ strategies = [
          kwargs=dict(long=60,short=10),
          args=[]),
 ]
+strategies_name_filter = lambda x :  [ s for s in strategies if s['name'] in x ]
