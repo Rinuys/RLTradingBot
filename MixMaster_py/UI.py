@@ -6,6 +6,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 from env.Strategies import *
 from run import main as program
+from pathlib import Path
 
 import threading
 import matplotlib.pyplot as plt
@@ -25,9 +26,11 @@ class Form(QtWidgets.QDialog):
         self.ui.show()
 
         self.tradingList.addItems([ func['name'] for func in strategies]) # 트레이딩 알고리즘 메뉴 등록
-        self.subjectList.addItems(['금','석유']) # 종목 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
-        self.viewSubjectList.addItems(['금','석유']) # 지표 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
-        self.selected_subject = ['금', ['금']] # 현재 선택된 종목
+
+        data_list = [ elem.name for elem in Path('../daily_data').iterdir() if elem.is_dir() ]
+        self.subjectList.addItems(data_list) # 종목 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
+        self.viewSubjectList.addItems(data_list) # 지표 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
+        self.selected_subject = [data_list[0], [data_list[0],]] # 현재 선택된 종목
         self.selected_trading = [] # 현재 선택된 알고리즘
         self.selected_learn = 'ppo' # 현재 선택된 강화학습방식, ppo or dqn
 

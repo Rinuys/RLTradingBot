@@ -240,7 +240,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 def create_gold_env(window_size, path, train, selected_trading, selected_subject, **ohlcv_kwargs):
     '''
     :param window_size: 초기 랜덤액션선택할 에피소드수
-    :param path: 파일 경로
+    :param path: 데이터파일의 경로
     :param train: 훈련여부? 아니면 테스트.
     tuple:param selected: (selected_learn, selected_trading, selected_subject). UI.py참조
     :return: gym Environment

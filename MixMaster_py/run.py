@@ -74,7 +74,7 @@ def main(
     gl_ui_window=ui_windows
 
     # create environment for train and test
-    DATA_PATH='../gold_daily_data'
+    DATA_PATH='../daily_data'
     environment = create_gold_env(window_size=window_size, path=DATA_PATH, train=True if mode=='train' else False,
                                   selected_trading=selected_trading, selected_subject=selected_subject,
                                   init_invest=init_invest)
@@ -82,9 +82,6 @@ def main(
 
     network_spec = create_network_spec()
     baseline_spec = create_baseline_spec()
-
-    # TODO Agent Strategies 의존성을 UI에서 선택가능하게끔 변경해야함.
-    print(selected_learn)
 
     if selected_learn=='ppo':
         agent = PPOAgent(

@@ -21,13 +21,18 @@ class OhlcvEnv(gym.Env):
         self.train= train
         self.show_trade = show_trade
         self.holdFactor = 1.0
-        self.path = os.path.join(path, "train" if train else "test")
+        self.path = path
+
         #self.actions = ["LONG", "SHORT", "FLAT"]
         self.n_strategies = len(selected_trading)
         self.selected_trading = selected_trading
+        self.subject_trade = selected_subject[0]
+        self.subject_view = selected_subject[1]
+
         self.actions = dict(min_value=0.0, max_value=self.maxTrade, type="float", shape=(self.n_strategies,))
         self.fee = 0.01
         self.seed()
+        self.subject_view_file_list = [ [] for sub in self.subject_view ]
         self.file_list = []
         # load_csv
         self.load_from_csv()
@@ -35,7 +40,7 @@ class OhlcvEnv(gym.Env):
         # n_features
         self.window_size = window_size # agent 브레인이 참고할 이전 타임스텝의 길이
         self.n_features = self.df.shape[1]
-        self.shape = (self.window_size, self.n_features)
+        self.shape = (self.window_size, len(self.subject_view)*self.n_features)
 
         # defines action space
         #self.action_space = spaces.Discrete(len(self.actions))
@@ -43,13 +48,47 @@ class OhlcvEnv(gym.Env):
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=self.shape, dtype=np.float32)
 
     def load_from_csv(self):
-        if(len(self.file_list) == 0):
-            self.file_list = [x.name for x in Path(self.path).iterdir() if x.is_file()]
-            self.file_list.sort()
-        self.rand_episode = self.file_list.pop()
-        raw_df= pd.read_csv(self.path + "/"+ self.rand_episode)
+        '''
+        subject_view의 순서대로
+        self.subject_view_file_list, self.df_view 를 만듭니다.
+        subject_trade의 self.df와 self.file_list도 생성합니다.
+        :return:
+        '''
+        # 뷰잉으로 사용된 종목 데이터 로딩
+        self.df_view = []
+        for subject, file_list in zip(self.subject_view, self.subject_view_file_list):
+            path = os.path.join(self.path, subject, 'train' if self.train else 'test')
+            if(len(file_list) == 0):
+                file_list = [x.name for x in Path(path).iterdir() if x.is_file()]
+                file_list.sort()
+            self.rand_episode = file_list.pop()
+            raw_df= pd.read_csv(path + "/"+ self.rand_episode)
+            extractor = process_data.FeatureExtractor(raw_df)
+            df = extractor.add_bar_features() # bar features o, h, l, c ---> C(4,2) = 4*3/2*1 = 6 features
+
+            ## selected manual fetuares
+            feature_list = [
+                'bar_hc',
+                'bar_ho',
+                'bar_hl',
+                'bar_cl',
+                'bar_ol',
+                'bar_co', 'close']
+            df.dropna(inplace=True) # drops Nan rows
+            self.closingPrices = df['close'].values
+            df = df[feature_list].values
+            self.df_view.append(df)
+
+        # 거래종목의 데이터 로딩
+        file_list = self.file_list
+        path = os.path.join(self.path, self.subject_trade, 'train' if self.train else 'test')
+        if (len(file_list) == 0):
+            file_list = [x.name for x in Path(path).iterdir() if x.is_file()]
+            file_list.sort()
+        self.rand_episode = file_list.pop()
+        raw_df = pd.read_csv(path + "/" + self.rand_episode)
         extractor = process_data.FeatureExtractor(raw_df)
-        self.df = extractor.add_bar_features() # bar features o, h, l, c ---> C(4,2) = 4*3/2*1 = 6 features
+        df = extractor.add_bar_features()  # bar features o, h, l, c ---> C(4,2) = 4*3/2*1 = 6 features
 
         ## selected manual fetuares
         feature_list = [
@@ -59,9 +98,9 @@ class OhlcvEnv(gym.Env):
             'bar_cl',
             'bar_ol',
             'bar_co', 'close']
-        self.df.dropna(inplace=True) # drops Nan rows
-        self.closingPrices = self.df['close'].values
-        self.df = self.df[feature_list].values
+        df.dropna(inplace=True)  # drops Nan rows
+        self.closingPrices = df['close'].values
+        self.df = df[feature_list].values
 
     def render(self, mode='human', verbose=False):
         return None
@@ -144,7 +183,6 @@ class OhlcvEnv(gym.Env):
         self.stock_owned = 0
         self.holdFactor = 1.0
 
-        # self.current_tick = random.randint(0, self.df.shape[0]-800)
         if(self.train):
             self.current_tick = random.randint(0, self.df.shape[0] - 800)
         else:
@@ -177,5 +215,6 @@ class OhlcvEnv(gym.Env):
 
     def updateState(self):
         self.closingPrice = float(self.closingPrices[self.current_tick])
-        state = self.df[self.current_tick]
-        return state.reshape(1,-1)
+
+        serialize = np.concatenate([ df[self.current_tick] for df in self.df_view])
+        return serialize.reshape(1,-1)
