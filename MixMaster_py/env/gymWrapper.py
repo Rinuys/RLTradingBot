@@ -40,7 +40,7 @@ class OpenAIGym(Environment):
             self.gym = gym.wrappers.Monitor(self.gym, monitor, force=not monitor_safe, video_callable=video_callable)
 
         self._states = dict(type='float', shape=gym.shape)
-        self._actions = self.actions_ = dict(type='float', shape=len(Strategies.strategies))
+        self._actions = self.actions_ = dict(type='float', shape=(gym.n_strategies,))
 
     def __str__(self):
         return 'OpenAIGym({})'.format(self.gym.name)
