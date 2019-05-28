@@ -83,7 +83,7 @@ class Form(QtWidgets.QDialog):
     @pyqtSlot()
     def loadModel(self):
         self.weight_path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file',
-                                    '', "weights files (*.h5)")[0]
+                                    '', "weights files (*.*)")[0]
         if self.weight_path!= "":
             file_name = self.weight_path.split('/')[-1]
             self.setInfo(file=file_name)
@@ -104,7 +104,7 @@ class Form(QtWidgets.QDialog):
         kwargs=dict(
             mode='train',
             episode=2000,
-            window_size=32,
+            window_size=30,
             init_invest=100*10000,
             model_path='model/',
             selected_learn=self.selected_learn,
@@ -116,6 +116,7 @@ class Form(QtWidgets.QDialog):
         self.running = threading.Thread(target=program, kwargs=kwargs)
         self.running.daemon = True
         self.running.start()
+
 
 
     @pyqtSlot()
@@ -130,7 +131,7 @@ class Form(QtWidgets.QDialog):
         kwargs=dict(
             mode='test',
             episode=1,
-            window_size=32,
+            window_size=30,
             init_invest=100*10000,
             model_path='../gold_daily_data',
             selected_learn=self.selected_learn,

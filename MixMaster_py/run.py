@@ -62,7 +62,7 @@ def create_baseline_spec():
 def main(
         mode, # 'train'  or 'test'
         episode=2000,
-        window_size=32, # agent 브레인이 참고할 이전 타임스텝의 길이
+        window_size=30, # agent 브레인이 참고할 이전 타임스텝의 길이
         init_invest=20000,
         model_path=None,
         selected_learn='dqn', # 'dqn' or 'ppo'

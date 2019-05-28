@@ -23,7 +23,6 @@ class OhlcvEnv(gym.Env):
         self.holdFactor = 1.0
         self.path = path
 
-        #self.actions = ["LONG", "SHORT", "FLAT"]
         self.n_strategies = len(selected_trading)
         self.selected_trading = selected_trading
         self.subject_trade = selected_subject[0]
