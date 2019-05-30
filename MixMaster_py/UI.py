@@ -7,11 +7,12 @@ from PyQt5.QtCore import pyqtSlot
 from env.Strategies import *
 from run import main as program
 from pathlib import Path
+import os
 
 import threading
 import matplotlib.pyplot as plt
 
-
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 class Form(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -76,37 +77,37 @@ class Form(QtWidgets.QDialog):
 
 
     @pyqtSlot()
-    def createModel(self):
-        self.weight_path = None
-        self.setInfo(file="None")
-
-    @pyqtSlot()
-    def loadModel(self):
-        self.weight_path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file',
-                                    '', "weights files (*.*)")[0]
+    def selectModelPath(self):
+        self.weight_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Model Path')
+        print(self.weight_path)
         if self.weight_path!= "":
-            file_name = self.weight_path.split('/')[-1]
-            self.setInfo(file=file_name)
+            dir_name = self.weight_path.split('/')[-1]
+            self.setInfo(file=dir_name)
         else:
             self.weight_path = None
             self.setInfo(file="없음")
+        print(self.episodesTextBox.toPlainText())
 
-
-    @pyqtSlot()
-    def saveModel(self):
-        pass
 
     @pyqtSlot()
     def modelTraining(self):
         if not self.running is None and self.running.is_alive():
             return
         self.portpolio_value_history = []
+
+        episodes_text : str = self.episodesTextBox.toPlainText()
+        if episodes_text.isnumeric():
+            episodes = int(episodes_text)
+        else:
+            episodes = 100
+
         kwargs=dict(
             mode='train',
-            episode=2000,
+            episode=episodes,
             window_size=30,
             init_invest=100*10000,
-            model_path='model/',
+            model_path=self.weight_path,
+            addition_train=self.additionalCheckBox.isChecked(),
             selected_learn=self.selected_learn,
             selected_trading=self.selected_trading,
             selected_subject=self.selected_subject,
@@ -116,6 +117,8 @@ class Form(QtWidgets.QDialog):
         self.running = threading.Thread(target=program, kwargs=kwargs)
         self.running.daemon = True
         self.running.start()
+
+        self.setInfo(msg='학습시작.')
 
 
 
@@ -128,12 +131,19 @@ class Form(QtWidgets.QDialog):
             self.setInfo(msg="트레이딩을 하기 위해 학습된 모델을 로드해주세요.")
             return
 
+        episodes_text : str = self.episodesTextBox.toPlainText()
+        if episodes_text.isnumeric():
+            episodes = int(episodes_text)
+        else:
+            episodes = 100
+
         kwargs=dict(
             mode='test',
-            episode=1,
+            episode=episodes,
             window_size=30,
             init_invest=100*10000,
-            model_path='../gold_daily_data',
+            model_path=self.weight_path,
+            addition_train=False,
             selected_learn=self.selected_learn,
             selected_trading=self.selected_trading,
             selected_subject=self.selected_subject,
@@ -143,6 +153,8 @@ class Form(QtWidgets.QDialog):
         self.running = threading.Thread(target=program, kwargs=kwargs)
         self.running.daemon = True
         self.running.start()
+
+        self.setInfo(msg="가상트레이딩 시작.")
 
     @pyqtSlot()
     def showGraph(self):

@@ -12,7 +12,13 @@ import argparse
 
 # issue 287
 LOAD_DIR = os.path.join(os.getcwd(), "model")
-SAVE_DIR = os.path.join(LOAD_DIR, "ppo_agent")
+SAVE_DIR = os.path.join(LOAD_DIR, "trading_model")
+
+def set_model_path(path):
+    global LOAD_DIR
+    global SAVE_DIR
+    LOAD_DIR = path
+    SAVE_DIR = os.path.join(LOAD_DIR, "trading_model")
 
 gl_ui_window = None
 
@@ -65,6 +71,7 @@ def main(
         window_size=30, # agent 브레인이 참고할 이전 타임스텝의 길이
         init_invest=20000,
         model_path=None,
+        addition_train=False,
         selected_learn='dqn', # 'dqn' or 'ppo'
         selected_trading=[],
         selected_subject=[],
@@ -72,6 +79,9 @@ def main(
 ):
     global gl_ui_window
     gl_ui_window=ui_windows
+
+    set_model_path(model_path if not model_path is None else os.path.join(os.getcwd(), 'model') )
+
 
     # create environment for train and test
     DATA_PATH='../daily_data'
@@ -148,6 +158,14 @@ def main(
             ],
         )
 
+    if mode=='test' or addition_train==True:
+        if len([ elem for elem in os.listdir(LOAD_DIR) if 'trading_model' in elem ])>=3:
+            agent.restore_model(LOAD_DIR)
+            print('loaded')
+        else:
+            ui_windows.setInfo(msg="로딩할 트레이딩모델이 존재하지 않는 것으로 보입니다.")
+            return
+
     runner = Runner(agent=agent, environment=environment)
     if mode=='train':
         kwargs=dict(
@@ -162,8 +180,6 @@ def main(
     # TODO save models. UI쪽에서 사용할 메타데이터저장하기. https://tensorforce.readthedocs.io/en/latest/agents_models.html?highlight=agent
     # agent.save_model()
 
-    # TODO load models.
-    # agent.restore_model()
 
     # TODO TFTraderEnv에 에피소드마다의 포트폴리오 결과치 저장해야함. UI에 매순간 데이터 설정하기.
     # setResult(????)

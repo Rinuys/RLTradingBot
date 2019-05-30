@@ -172,8 +172,8 @@ class OhlcvEnv(gym.Env):
         info = {'portfolio':np.array([self.portfolio]), "history":self.history}
         if (self.current_tick > (self.df.shape[0]) - self.window_size-1):
             self.done = True
-            if(self.train == False):
-                np.array([info]).dump('info/ppo_{0}_LS.info'.format(self.portfolio))
+            # if(self.train == False):
+            #     np.array([info]).dump('info/ppo_{0}_LS.info'.format(self.portfolio))
         
         return self.state, self.reward, self.done, info
 
