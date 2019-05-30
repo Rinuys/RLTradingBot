@@ -81,7 +81,8 @@ def main(
     gl_ui_window=ui_windows
 
     set_model_path(model_path if not model_path is None else os.path.join(os.getcwd(), 'model') )
-
+    if not 'model' in os.listdir(os.getcwd()):
+        os.makedirs('model')
 
     # create environment for train and test
     DATA_PATH='../daily_data'
@@ -162,7 +163,7 @@ def main(
         if len([ elem for elem in os.listdir(LOAD_DIR) if 'trading_model' in elem ])>=3:
             agent.restore_model(LOAD_DIR)
             print('loaded')
-        else:
+        elif mode=='test':
             ui_windows.setInfo(msg="로딩할 트레이딩모델이 존재하지 않는 것으로 보입니다.")
             return
 

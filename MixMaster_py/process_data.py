@@ -1,5 +1,5 @@
 import pandas as pd
-import talib
+# import talib
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 # import ta
