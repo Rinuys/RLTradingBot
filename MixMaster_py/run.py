@@ -30,7 +30,7 @@ def episode_finished(r):
                                                                                  reward=reward)
     print(msg)
     gl_ui_window.setInfo(msg=msg)
-    gl_ui_window.portpolio_value_history.append(reward) # TODO 포트 폴리오 값 얻는법을 찾아야함.
+    gl_ui_window.portpolio_value_history.append(r.environment.gym.portfolio) # TODO 포트 폴리오 값 얻는법을 찾아야함.
 
     if np.mean(r.episode_rewards[-1]) > 0 :
         r.agent.save_model(SAVE_DIR, append_timestep=False)
@@ -176,10 +176,6 @@ def main(
             num_episodes=episode, deterministic=True, testing=True, episode_finished=print_simple_log
         )
     runner.run(**kwargs)
-
-    # TODO save models. UI쪽에서 사용할 메타데이터저장하기. https://tensorforce.readthedocs.io/en/latest/agents_models.html?highlight=agent
-    # agent.save_model()
-
 
     # TODO TFTraderEnv에 에피소드마다의 포트폴리오 결과치 저장해야함. UI에 매순간 데이터 설정하기.
     # setResult(????)

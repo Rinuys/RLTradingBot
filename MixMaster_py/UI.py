@@ -158,6 +158,7 @@ class Form(QtWidgets.QDialog):
 
     @pyqtSlot()
     def showGraph(self):
+        print("portfolio", self.portpolio_value_history)
         plt.plot(self.portpolio_value_history)
         plt.ylabel("포트폴리오 가치")
         plt.show()
