@@ -1,0 +1,8 @@
+tensorforce
+tensorflow
+PyQt5
+gym==0.12.1
+pandas
+sklearn
+matplotlib
+numpy
