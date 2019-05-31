@@ -37,9 +37,6 @@
     <property name="text">
      <string>PPO</string>
     </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
    </widget>
    <widget class="QRadioButton" name="selectDQN">
     <property name="geometry">
@@ -87,11 +84,11 @@
      <x>360</x>
      <y>10</y>
      <width>161</width>
-     <height>111</height>
+     <height>301</height>
     </rect>
    </property>
    <property name="title">
-    <string>트레이딩할 종목 선택</string>
+    <string>트레이딩에 사용할 종목 선택</string>
    </property>
    <widget class="QListWidget" name="subjectList">
     <property name="geometry">
@@ -99,19 +96,32 @@
       <x>10</x>
       <y>30</y>
       <width>141</width>
-      <height>71</height>
+      <height>261</height>
      </rect>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::SingleSelection</enum>
+     <enum>QAbstractItemView::MultiSelection</enum>
     </property>
    </widget>
+  </widget>
+  <widget class="QPushButton" name="newModelBtn">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>10</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>모델 생성</string>
+   </property>
   </widget>
   <widget class="QLabel" name="modelInfoLabel">
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>300</y>
+     <y>320</y>
      <width>341</width>
      <height>71</height>
     </rect>
@@ -124,7 +134,20 @@
     <enum>Qt::AutoText</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="selModelPathlBtn">
+  <widget class="QPushButton" name="loadModelBtn">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>60</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>모델 불러오기</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveModelBtn">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -134,7 +157,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>모델폴더 지정</string>
+    <string>모델 저장</string>
    </property>
   </widget>
   <widget class="QPushButton" name="trainingBtn">
@@ -174,64 +197,6 @@
    </property>
    <property name="text">
     <string>학습/결과 그래프 확인</string>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="viewSubjectGroupBox">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>130</y>
-     <width>161</width>
-     <height>171</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>모델이 사용할 지표 선택</string>
-   </property>
-   <widget class="QListWidget" name="viewSubjectList">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>141</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::MultiSelection</enum>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QTextEdit" name="episodesTextBox">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>20</y>
-     <width>161</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="placeholderText">
-    <string>학습 에피소드 수</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="additionalCheckBox">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>60</y>
-     <width>161</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>기존 모델에 추가 학습하기</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
    </property>
   </widget>
  </widget>
@@ -286,10 +251,26 @@
    </hints>
   </connection>
   <connection>
-   <sender>selModelPathlBtn</sender>
+   <sender>newModelBtn</sender>
    <signal>clicked()</signal>
    <receiver>MainDialog</receiver>
-   <slot>selectModelPath()</slot>
+   <slot>createModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>300</x>
+     <y>34</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>276</x>
+     <y>321</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadModelBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>loadModel()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>200</x>
@@ -298,6 +279,22 @@
     <hint type="destinationlabel">
      <x>225</x>
      <y>289</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveModelBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>saveModel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>238</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>193</x>
+     <y>297</y>
     </hint>
    </hints>
   </connection>
@@ -349,38 +346,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>viewSubjectList</sender>
-   <signal>itemSelectionChanged()</signal>
-   <receiver>MainDialog</receiver>
-   <slot>changedSubject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>426</x>
-     <y>219</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>450</x>
-     <y>316</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>subjectList</sender>
-   <signal>itemSelectionChanged()</signal>
-   <receiver>MainDialog</receiver>
-   <slot>changedSubject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>413</x>
-     <y>74</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>373</x>
-     <y>311</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>dqnSelect()</slot>
@@ -388,10 +353,10 @@
   <slot>changedTrading()</slot>
   <slot>changedSubject()</slot>
   <slot>createModel()</slot>
+  <slot>loadModel()</slot>
   <slot>saveModel()</slot>
   <slot>modelTraining()</slot>
   <slot>modelTest()</slot>
   <slot>showGraph()</slot>
-  <slot>selectModelPath()</slot>
  </slots>
 </ui>
