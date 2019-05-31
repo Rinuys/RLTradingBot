@@ -26,7 +26,7 @@ gl_ui_window = None
 def episode_finished(r):
     # TODO 모델을 여기서 매호ㅓ 저장??
     reward = "%.6f" % (r.episode_rewards[-1])
-    msg = "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
+    msg = "Finished episode {ep} after {ts} timesteps \n(reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
                                                                                  reward=reward)
     print(msg)
     gl_ui_window.setInfo(msg=msg)
@@ -37,7 +37,7 @@ def episode_finished(r):
     return True
 
 def print_simple_log(r):
-    msg = "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
+    msg = "Finished episode {ep} after {ts} timesteps \n(reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
                                                                                  reward=r.episode_rewards[-1])
     print(msg)
     gl_ui_window.setInfo(msg=msg)
@@ -180,7 +180,7 @@ def main(
 
     # TODO TFTraderEnv에 에피소드마다의 포트폴리오 결과치 저장해야함. UI에 매순간 데이터 설정하기.
     # setResult(????)
-    msg = "{mode} finished. Total episodes: {ep}. Average reward of last 100 episodes: {ar}.".format(
+    msg = "{mode} finished. Total episodes: {ep}. \nAverage reward of last 100 episodes: {ar}.".format(
         mode="Training" if mode=='train' else "Testing",
         ep=runner.episode,
         ar=np.mean(runner.episode_rewards[-100:])
