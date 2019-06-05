@@ -12,12 +12,12 @@ import os
 import threading
 import matplotlib.pyplot as plt
 
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+#os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 class Form(QtWidgets.QDialog):
     def __init__(self, parent=None):
         QtWidgets.QDialog.__init__(self, parent)
-        self.ui = uic.loadUi("mainWindow.ui", self)
+        self.ui = uic.loadUi("E:\Project\RLTradingBot\MixMaster_py\mainWindow.ui", self)
 
         self.weight_path = None # 현재 선택된 모델이 담긴 폴더 TODO 모델 파일? 폴더?
         self.info = ['없음','비실행중']  # ['현재 모델파일', '학습/테스트 메시지']
@@ -28,7 +28,7 @@ class Form(QtWidgets.QDialog):
 
         self.tradingList.addItems([ func['name'] for func in strategies]) # 트레이딩 알고리즘 메뉴 등록
 
-        data_list = [ elem.name for elem in Path('../daily_data').iterdir() if elem.is_dir() ]
+        data_list = [ elem.name for elem in Path('E:\Project\RLTradingBot\daily_data').iterdir() if elem.is_dir() ]
         self.subjectList.addItems(data_list) # 종목 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
         self.viewSubjectList.addItems(data_list) # 지표 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
         self.selected_subject = [data_list[0], [data_list[0],]] # 현재 선택된 종목

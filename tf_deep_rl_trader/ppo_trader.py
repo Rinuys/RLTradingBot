@@ -123,7 +123,7 @@ def main():
     )
 
     train_runner.run(episodes=5, max_episode_timesteps=16000, episode_finished=episode_finished)
-    print("Learning finished. Total episodes: {ep}. Average reward of last 100 episodes: {ar}.".format(
+    print("Learning finished. Total episodes: {ep}. Average reward of last  episodes: {ar}.".format(
         ep=train_runner.episode,
         ar=np.mean(train_runner.episode_rewards[-100:]))
     )

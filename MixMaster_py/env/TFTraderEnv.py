@@ -162,6 +162,10 @@ class OhlcvEnv(gym.Env):
         temp_portfolio = self.cash_in_hand + self.stock_owned * self.closingPrice
         self.portfolio = temp_portfolio
         self.reward += (temp_portfolio - self.init_invest) * self.holdFactor
+        if(self.reward < -30):
+            self.reward = -30
+        if(self.reward > 30):
+            self.reward = 30
         self.current_tick += 1
 
         if(self.show_trade and self.current_tick%100 == 0):
@@ -194,7 +198,7 @@ class OhlcvEnv(gym.Env):
         self.cash_in_hand = self.init_invest # initial balance, u can change it to whatever u like
         self.portfolio = float(self.cash_in_hand) # (coin * current_price + current_krw_balance) == portfolio
         self.closingPrice = self.closingPrices[self.current_tick]
-
+        #self.current_tick = 0
         self.action = np.zeros(self.n_strategies)
         self.done = False
 

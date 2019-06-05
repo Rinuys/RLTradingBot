@@ -85,7 +85,7 @@ def main(
         os.makedirs('model')
 
     # create environment for train and test
-    DATA_PATH='../daily_data'
+    DATA_PATH='E:\Project\RLTradingBot\daily_data'
     environment = create_gold_env(window_size=window_size, path=DATA_PATH, train=True if mode=='train' else False,
                                   selected_trading=selected_trading, selected_subject=selected_subject,
                                   init_invest=init_invest)
@@ -180,10 +180,10 @@ def main(
 
     # TODO TFTraderEnv에 에피소드마다의 포트폴리오 결과치 저장해야함. UI에 매순간 데이터 설정하기.
     # setResult(????)
-    msg = "{mode} finished. Total episodes: {ep}. Average reward of last 100 episodes: {ar}.".format(
+    msg = "{mode} finished. Total episodes: {ep}. Average reward of last {ep} episodes: {ar}.".format(
         mode="Training" if mode=='train' else "Testing",
         ep=runner.episode,
-        ar=np.mean(runner.episode_rewards[-100:])
+        ar=np.mean(runner.episode_rewards[:])
     )
     print(msg)
     ui_windows.setInfo(msg=msg)
