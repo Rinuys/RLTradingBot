@@ -231,7 +231,7 @@
     <string>기존 모델에 추가 학습하기</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
