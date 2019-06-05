@@ -72,7 +72,7 @@ def main(
         init_invest=20000,
         model_path=None,
         addition_train=False,
-        selected_learn='dqn', # 'dqn' or 'ppo'
+        selected_learn='ppo', # 'dqn' or 'ppo'
         selected_trading=[],
         selected_subject=[],
         ui_windows=None, # 현재 띄워진 Ui객체
@@ -174,7 +174,7 @@ def main(
         )
     else: # mode=='test'
         kwargs=dict(
-            num_episodes=episode, deterministic=True, testing=True, episode_finished=print_simple_log
+            num_episodes=episode, testing=True, episode_finished=print_simple_log
         )
     runner.run(**kwargs)
 

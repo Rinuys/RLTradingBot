@@ -17,7 +17,7 @@ class OhlcvEnv(gym.Env):
     def __init__(self, window_size, path, selected_trading, selected_subject, train=True, show_trade=True,
                  init_invest=100*10000):
         self.init_invest=init_invest
-        self.maxTrade = 100.0
+        self.maxTrade = 1000.0
         self.train= train
         self.show_trade = show_trade
         self.holdFactor = 1.0
@@ -43,7 +43,7 @@ class OhlcvEnv(gym.Env):
 
         # defines action space
         #self.action_space = spaces.Discrete(len(self.actions))
-        self.action_space = spaces.Box(low=0, high=int(self.maxTrade), shape=(self.n_strategies,), dtype=np.float32)
+        self.action_space = spaces.Box(low=0, high=int(self.maxTrade/2), shape=(self.n_strategies,), dtype=np.float32)
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=self.shape, dtype=np.float32)
 
     def load_from_csv(self):
@@ -176,6 +176,8 @@ class OhlcvEnv(gym.Env):
         info = {'portfolio':np.array([self.portfolio]), "history":self.history}
         if (self.current_tick > (self.df.shape[0]) - self.window_size-1):
             self.done = True
+        if (self.current_tick >= self.end_tick - self.window_size-1):
+            self.done = True
             # if(self.train == False):
             #     np.array([info]).dump('info/ppo_{0}_LS.info'.format(self.portfolio))
         
@@ -190,6 +192,8 @@ class OhlcvEnv(gym.Env):
             self.current_tick = random.randint(0, self.df.shape[0] - 800)
         else:
             self.current_tick = 0
+
+        self.end_tick = random.randint(self.current_tick, self.df.shape[0] - self.window_size + 1)
 
         print("start episode ... {0} at {1}" .format(self.rand_episode, self.current_tick))
 
