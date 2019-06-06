@@ -6,29 +6,32 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 from env.Strategies import *
 from run import main as program
+from run import default_path
 from pathlib import Path
 import os
 
 import threading
 import matplotlib.pyplot as plt
 
-#os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+
+
 
 class Form(QtWidgets.QDialog):
     def __init__(self, parent=None):
         QtWidgets.QDialog.__init__(self, parent)
-        self.ui = uic.loadUi("E:\Project\RLTradingBot\MixMaster_py\mainWindow.ui", self)
+        self.ui = uic.loadUi(default_path['ui_file'], self)
 
-        self.weight_path = None # 현재 선택된 모델이 담긴 폴더 TODO 모델 파일? 폴더?
+        self.weight_path = None # 현재 선택된 모델이 담긴 폴더
         self.info = ['없음','비실행중']  # ['현재 모델파일', '학습/테스트 메시지']
-        self.portpolio_value_history = [] # 학습/테스트 스레드가 남길 히스토리배열
+        self.episode_history, self.tick_history = [],[] # 학습/테스트 스레드가 남길 히스토리배열
         self.setInfo("없음")
         self.running = None
         self.ui.show()
 
         self.tradingList.addItems([ func['name'] for func in strategies]) # 트레이딩 알고리즘 메뉴 등록
 
-        data_list = [ elem.name for elem in Path('E:\Project\RLTradingBot\daily_data').iterdir() if elem.is_dir() ]
+        data_list = [ elem.name for elem in Path(default_path['data_folder']).iterdir() if elem.is_dir() ]
         self.subjectList.addItems(data_list) # 종목 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
         self.viewSubjectList.addItems(data_list) # 지표 선택 메뉴 등록 TODO Ui에 종목 등록 유언성 필요
         self.selected_subject = [data_list[0], [data_list[0],]] # 현재 선택된 종목
@@ -45,6 +48,7 @@ class Form(QtWidgets.QDialog):
         self.info[0] = file if not file is None else self.info[0]
         self.info[1] = msg if not msg is None else self.info[1]
         self.ui.modelInfoLabel.setText(baseText.format(*self.info))
+        self.ui.modelInfoLabel.update()
 
 
     #이벤트 슬롯 구현
@@ -93,13 +97,13 @@ class Form(QtWidgets.QDialog):
     def modelTraining(self):
         if not self.running is None and self.running.is_alive():
             return
-        self.portpolio_value_history = []
+
+        self.tick_history,self.episode_history = [],[]
 
         episodes_text : str = self.episodesTextBox.toPlainText()
-        if episodes_text.isnumeric():
-            episodes = int(episodes_text)
-        else:
-            episodes = 100
+        episodes = int(episodes_text) if episodes_text.isnumeric() else 100
+
+        self.weight_path = self.weight_path if self.weight_path is None else default_path['default_model']
 
         kwargs=dict(
             mode='train',
@@ -120,22 +124,19 @@ class Form(QtWidgets.QDialog):
 
         self.setInfo(msg='학습시작.')
 
-
-
     @pyqtSlot()
     def modelTest(self):
         if not self.running is None and self.running.is_alive():
             return
-        self.portpolio_value_history = []
-        if self.weight_path is None:
-            self.setInfo(msg="트레이딩을 하기 위해 학습된 모델을 로드해주세요.")
-            return
+
+        self.tick_history,self.episode_history = [],[]
+
 
         episodes_text : str = self.episodesTextBox.toPlainText()
         if episodes_text.isnumeric():
             episodes = int(episodes_text)
         else:
-            episodes = 100
+            episodes = 1
 
         kwargs=dict(
             mode='test',
@@ -158,9 +159,17 @@ class Form(QtWidgets.QDialog):
 
     @pyqtSlot()
     def showGraph(self):
-        print("portfolio", self.portpolio_value_history)
-        plt.plot(self.portpolio_value_history)
-        plt.ylabel("포트폴리오 가치")
+        if len(self.episode_history) > 0 :
+            dat = self.episode_history
+            xlabel='episode'
+        else:
+            dat = self.tick_history
+            xlabel='tick'
+
+        print(xlabel, dat)
+        plt.plot(dat)
+        plt.ylabel("portpolio_value")
+        plt.xlabel(xlabel)
         plt.show()
 
 if __name__ == '__main__':

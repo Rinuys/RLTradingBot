@@ -11,8 +11,15 @@ import os
 import argparse
 
 # issue 287
-LOAD_DIR = os.path.join(os.getcwd(), "model")
-SAVE_DIR = os.path.join(LOAD_DIR, "trading_model")
+# LOAD_DIR = os.path.join(os.getcwd(), "model")
+# SAVE_DIR = os.path.join(LOAD_DIR, "trading_model")
+
+# 기본값 및 데이터 폴더들
+default_path = dict(
+    ui_file = 'mainWindow.ui',
+    data_folder = '../daily_data',
+    default_model = './model',
+)
 
 def set_model_path(path):
     global LOAD_DIR
@@ -23,24 +30,26 @@ def set_model_path(path):
 gl_ui_window = None
 
 # Callback function printing episode statistics
-def episode_finished(r):
+def episode_finished_train(r):
     # TODO 모델을 여기서 매호ㅓ 저장??
     reward = "%.6f" % (r.episode_rewards[-1])
-    msg = "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
+    msg = "Finished episode {ep} after {ts} timesteps \n(reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
                                                                                  reward=reward)
     print(msg)
     gl_ui_window.setInfo(msg=msg)
-    gl_ui_window.portpolio_value_history.append(r.environment.gym.portfolio) # TODO 포트 폴리오 값 얻는법을 찾아야함.
+    gl_ui_window.episode_history.append(r.environment.gym.portfolio)
 
     if np.mean(r.episode_rewards[-1]) > 0 :
         r.agent.save_model(SAVE_DIR, append_timestep=False)
     return True
 
-def print_simple_log(r):
-    msg = "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
+def episode_finished_test(r):
+    msg = "Finished episode {ep} after {ts} timesteps \n(reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
                                                                                  reward=r.episode_rewards[-1])
     print(msg)
     gl_ui_window.setInfo(msg=msg)
+    gl_ui_window.tick_history = r.environment.gym.tick_value
+
 
 def create_network_spec():
     network_spec = [
@@ -80,12 +89,12 @@ def main(
     global gl_ui_window
     gl_ui_window=ui_windows
 
-    set_model_path(model_path if not model_path is None else os.path.join(os.getcwd(), 'model') )
-    if not 'model' in os.listdir(os.getcwd()):
-        os.makedirs('model')
+    model_path = model_path if not model_path is None else os.path.join(os.getcwd(), 'model')
+    set_model_path(model_path)
+    os.makedirs(model_path, exist_ok=True)
 
     # create environment for train and test
-    DATA_PATH='E:\Project\RLTradingBot\daily_data'
+    DATA_PATH=default_path['data_folder']
     environment = create_gold_env(window_size=window_size, path=DATA_PATH, train=True if mode=='train' else False,
                                   selected_trading=selected_trading, selected_subject=selected_subject,
                                   init_invest=init_invest)
@@ -170,17 +179,17 @@ def main(
     runner = Runner(agent=agent, environment=environment)
     if mode=='train':
         kwargs=dict(
-            episodes=episode, max_episode_timesteps=16000, episode_finished=episode_finished
+            episodes=episode, max_episode_timesteps=16000, episode_finished=episode_finished_train
         )
     else: # mode=='test'
         kwargs=dict(
-            num_episodes=episode, testing=True, episode_finished=print_simple_log
+            num_episodes=episode, testing=True, episode_finished=episode_finished_test
         )
     runner.run(**kwargs)
 
     # TODO TFTraderEnv에 에피소드마다의 포트폴리오 결과치 저장해야함. UI에 매순간 데이터 설정하기.
     # setResult(????)
-    msg = "{mode} finished. Total episodes: {ep}. Average reward of last {ep} episodes: {ar}.".format(
+    msg = "{mode} finished. Total episodes: {ep}. \nAverage reward of last {ep} episodes: {ar}.".format(
         mode="Training" if mode=='train' else "Testing",
         ep=runner.episode,
         ar=np.mean(runner.episode_rewards[:])

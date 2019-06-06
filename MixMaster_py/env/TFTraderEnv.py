@@ -168,6 +168,8 @@ class OhlcvEnv(gym.Env):
             self.reward = 30
         self.current_tick += 1
 
+        self.tick_value.append(temp_portfolio) # tick마다 포트폴리오 가치 저장
+
         if(self.show_trade and self.current_tick%100 == 0):
              print("Tick: {0}/ Portfolio (krw-won): {1}".format(self.current_tick, self.portfolio))
 
@@ -205,6 +207,9 @@ class OhlcvEnv(gym.Env):
         #self.current_tick = 0
         self.action = np.zeros(self.n_strategies)
         self.done = False
+
+        # 테스트 틱데이터 초기화
+        self.tick_value = []
 
         self.state_queue = deque(maxlen=self.window_size)
         self.state = self.preheat_queue()
