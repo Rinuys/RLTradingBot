@@ -166,6 +166,9 @@ class Form(QtWidgets.QDialog):
             dat = self.tick_history
             xlabel='tick'
 
+        with open("graph.csv","wt") as wf:
+            print(*dat, sep=',',file=wf)
+
         print(xlabel, dat)
         plt.plot(dat)
         plt.ylabel("portpolio_value")
