@@ -143,6 +143,7 @@ class OhlcvEnv(gym.Env):
             self.cash_in_hand -= int(self.closingPrice * v * (1.0 + self.fee))
             self.stock_owned += v
 
+            self.tick_decision.append(1)
         elif v<-1.0:
             # sell
             self.holdFactor = 1.0
@@ -153,10 +154,13 @@ class OhlcvEnv(gym.Env):
                 v = self.stock_owned
             self.cash_in_hand += int(self.closingPrice * v * (1.0 - self.fee))
             self.stock_owned -= v
+
+            self.tick_decision.append(-1)
             
         else:
             # hold
             self.holdFactor *= 1.01 # 음수에선 강한 부정리워드, 양수에선 강한 긍정리워드
+            self.tick_decision.append(0)
             pass
         
         temp_portfolio = self.cash_in_hand + self.stock_owned * self.closingPrice
@@ -210,6 +214,7 @@ class OhlcvEnv(gym.Env):
 
         # 테스트 틱데이터 초기화
         self.tick_value = []
+        self.tick_decision = []
 
         self.state_queue = deque(maxlen=self.window_size)
         self.state = self.preheat_queue()

@@ -11,8 +11,6 @@ import os
 import argparse
 
 # issue 287
-# LOAD_DIR = os.path.join(os.getcwd(), "model")
-# SAVE_DIR = os.path.join(LOAD_DIR, "trading_model")
 
 # 기본값 및 데이터 폴더들
 default_path = dict(
@@ -49,6 +47,7 @@ def episode_finished_test(r):
     print(msg)
     gl_ui_window.setInfo(msg=msg)
     gl_ui_window.tick_history = r.environment.gym.tick_value
+    gl_ui_window.tick_decision = r.environment.gym.tick_decision
 
 
 def create_network_spec():
@@ -187,13 +186,17 @@ def main(
         )
     runner.run(**kwargs)
 
-    # TODO TFTraderEnv에 에피소드마다의 포트폴리오 결과치 저장해야함. UI에 매순간 데이터 설정하기.
-    # setResult(????)
-    msg = "{mode} finished. Total episodes: {ep}. \nAverage reward of last {ep} episodes: {ar}.".format(
-        mode="Training" if mode=='train' else "Testing",
-        ep=runner.episode,
-        ar=np.mean(runner.episode_rewards[:])
-    )
+    if mode=='train':
+        msg = "{mode} finished. Total episodes: {ep}. \nAverage reward of last {ep} episodes: {ar}.".format(
+            mode="Training" if mode=='train' else "Testing",
+            ep=runner.episode,
+            ar=np.mean(runner.episode_rewards[:])
+        )
+    else:
+        msg = "{mode} finished. Last portpolio value : {value}.".format(
+            mode="Testing",
+            value=gl_ui_window.tick_history[-1],
+        )
     print(msg)
     ui_windows.setInfo(msg=msg)
 

@@ -24,7 +24,7 @@ class Form(QtWidgets.QDialog):
 
         self.weight_path = None # 현재 선택된 모델이 담긴 폴더
         self.info = ['없음','비실행중']  # ['현재 모델파일', '학습/테스트 메시지']
-        self.episode_history, self.tick_history = [],[] # 학습/테스트 스레드가 남길 히스토리배열
+        self.episode_history, self.tick_history, self.tick_decision = [],[],[] # 학습/테스트 스레드가 남길 히스토리배열
         self.setInfo("없음")
         self.running = None
         self.ui.show()
@@ -96,6 +96,7 @@ class Form(QtWidgets.QDialog):
     @pyqtSlot()
     def modelTraining(self):
         if not self.running is None and self.running.is_alive():
+            self.setInfo(msg='이전 학습/테스트가 아직 진행중입니다.')
             return
 
         self.tick_history,self.episode_history = [],[]
@@ -103,7 +104,7 @@ class Form(QtWidgets.QDialog):
         episodes_text : str = self.episodesTextBox.toPlainText()
         episodes = int(episodes_text) if episodes_text.isnumeric() else 100
 
-        self.weight_path = self.weight_path if self.weight_path is None else default_path['default_model']
+        self.weight_path = self.weight_path if not self.weight_path is None else default_path['default_model']
 
         kwargs=dict(
             mode='train',
@@ -127,6 +128,7 @@ class Form(QtWidgets.QDialog):
     @pyqtSlot()
     def modelTest(self):
         if not self.running is None and self.running.is_alive():
+            self.setInfo(msg='이전 학습/테스트가 아직 진행중입니다.')
             return
 
         self.tick_history,self.episode_history = [],[]
@@ -161,16 +163,29 @@ class Form(QtWidgets.QDialog):
     def showGraph(self):
         if len(self.episode_history) > 0 :
             dat = self.episode_history
+            buy_points = [[],[]]
+            sell_points = [[],[]]
             xlabel='episode'
         else:
             dat = self.tick_history
+            buy_points = [[],[]]
+            sell_points = [[],[]]
+            for i,d in enumerate(self.tick_decision):
+                if d==1:
+                    buy_points[0].append(i)
+                    buy_points[1].append(dat[i])
+                elif d==--1:
+                    sell_points[0].append(i)
+                    sell_points[1].append(dat[i])
             xlabel='tick'
 
         with open("graph.csv","wt") as wf:
             print(*dat, sep=',',file=wf)
 
         print(xlabel, dat)
-        plt.plot(dat)
+        plt.plot(dat, c='b')
+        plt.scatter(*buy_points,c='g')
+        plt.scatter(*sell_points,c='r')
         plt.ylabel("portpolio_value")
         plt.xlabel(xlabel)
         plt.show()
