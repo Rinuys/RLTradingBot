@@ -199,7 +199,10 @@ class OhlcvEnv(gym.Env):
         else:
             self.current_tick = 0
 
-        self.end_tick = random.randint(self.current_tick, self.df.shape[0] - self.window_size + 1)
+        if(self.train):
+            self.end_tick = random.randint(self.current_tick, self.df.shape[0] - self.window_size + 1)
+        else:
+            self.end_tick = self.df.shape[0] - self.window_size + 1
 
         print("start episode ... {0} at {1}" .format(self.rand_episode, self.current_tick))
 

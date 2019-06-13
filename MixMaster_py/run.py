@@ -37,8 +37,9 @@ def episode_finished_train(r):
     gl_ui_window.setInfo(msg=msg)
     gl_ui_window.episode_history.append(r.environment.gym.portfolio)
 
-    if np.mean(r.episode_rewards[-1]) > 0 :
-        r.agent.save_model(SAVE_DIR, append_timestep=False)
+    # if np.mean(r.episode_rewards[-1]) > 0 :
+    re = r.agent.save_model(SAVE_DIR, append_timestep=False)
+    print("save results ", re)
     return True
 
 def episode_finished_test(r):
