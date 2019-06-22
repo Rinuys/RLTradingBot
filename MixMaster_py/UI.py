@@ -174,7 +174,7 @@ class Form(QtWidgets.QDialog):
                 if d==1:
                     buy_points[0].append(i)
                     buy_points[1].append(dat[i])
-                elif d==--1:
+                elif d==-1:
                     sell_points[0].append(i)
                     sell_points[1].append(dat[i])
             xlabel='tick'
@@ -183,6 +183,8 @@ class Form(QtWidgets.QDialog):
             print(*dat, sep=',',file=wf)
 
         print(xlabel, dat)
+        print("buypoints : ", buy_points)
+        print("sellpoints : ", sell_points)
         plt.plot(dat, c='b')
         plt.scatter(*buy_points,c='g')
         plt.scatter(*sell_points,c='r')
